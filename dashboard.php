@@ -972,36 +972,63 @@ if ('serviceWorker' in navigator) {
 }
         
         // Install prompt for PWA
-        let deferredPrompt;
+let deferredPrompt;
+let installButton;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('Install prompt triggered');
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Show install button
+    showInstallButton();
+});
+
+function showInstallButton() {
+    // Remove existing install button if any
+    if (installButton) {
+        installButton.remove();
+    }
+    
+    // Create install button
+    installButton = document.createElement('button');
+    installButton.className = 'fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center space-x-2 hover:bg-blue-700 transition-colors';
+    installButton.innerHTML = '<i class="fas fa-download"></i><span>Install App</span>';
+    
+    installButton.onclick = async () => {
+        if (!deferredPrompt) return;
         
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Show install button (you can add this to your UI)
-            const installBtn = document.createElement('button');
-            installBtn.className = 'fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-            installBtn.innerHTML = '<i class="fas fa-download mr-2"></i>Install App';
-            installBtn.onclick = () => {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    }
-                    deferredPrompt = null;
-                    document.body.removeChild(installBtn);
-                });
-            };
-            
-            document.body.appendChild(installBtn);
-            
-            // Auto-hide after 10 seconds
-            setTimeout(() => {
-                if (document.body.contains(installBtn)) {
-                    document.body.removeChild(installBtn);
-                }
-            }, 10000);
-        });
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        console.log('User choice:', outcome);
+        
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        }
+        
+        deferredPrompt = null;
+        installButton.remove();
+    };
+    
+    document.body.appendChild(installButton);
+    
+    // Auto-hide after 15 seconds
+    setTimeout(() => {
+        if (installButton && document.body.contains(installButton)) {
+            installButton.remove();
+        }
+    }, 15000);
+}
+
+// Handle app installed
+window.addEventListener('appinstalled', (e) => {
+    console.log('App was installed');
+    if (installButton) {
+        installButton.remove();
+    }
+});
+          
     </script>
     <script src="assets/js/app.js"></script>
 </body>
