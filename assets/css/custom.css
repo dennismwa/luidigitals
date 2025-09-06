@@ -1,0 +1,49 @@
+/* Custom animations and utilities */
+.notification-slide {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.form-dirty {
+    position: relative;
+}
+
+.form-dirty::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #f59e0b, #10b981);
+    border-radius: 8px;
+    z-index: -1;
+}
+/* Add to your custom CSS file or in a <style> tag */
+.savings-progress-ring {
+    transform: rotate(-90deg);
+}
+
+.savings-card-glow {
+    box-shadow: 0 0 20px rgba(22, 172, 46, 0.3);
+}
+
+.completed-goal {
+    background: linear-gradient(45deg, #16ac2e, #10b981);
+    color: white;
+}
+
+.savings-floating {
+    animation: savings-float 4s ease-in-out infinite;
+}
+
+@keyframes savings-float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(1deg); }
+    50% { transform: translateY(-5px) rotate(-1deg); }
+    75% { transform: translateY(-8px) rotate(1deg); }
+}
