@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Luidigitals Wallet</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #204cb0 0%, #16ac2e 100%);
+        }
+        .floating-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-10 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full floating-animation"></div>
+        <div class="absolute top-32 right-20 w-16 h-16 bg-white bg-opacity-5 rounded-full floating-animation" style="animation-delay: -1s;"></div>
+        <div class="absolute bottom-20 left-20 w-24 h-24 bg-white bg-opacity-5 rounded-full floating-animation" style="animation-delay: -2s;"></div>
+        <div class="absolute bottom-32 right-10 w-12 h-12 bg-white bg-opacity-10 rounded-full floating-animation" style="animation-delay: -0.5s;"></div>
+    </div>
+
+    <!-- Offline Container -->
+    <div class="text-center text-white max-w-md">
+        <!-- Icon -->
+        <div class="mx-auto w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-6 pulse-animation">
+            <i class="fas fa-wifi-slash text-4xl text-white"></i>
+        </div>
+        
+        <!-- Title and Message -->
+        <h1 class="text-4xl font-bold mb-4">You're Offline</h1>
+        <p class="text-white text-opacity-80 mb-8">
+            It looks like you've lost your internet connection. Don't worry, you can still view your cached data and the app will sync when you're back online.
+        </p>
+        
+        <!-- Actions -->
+        <div class="space-y-4">
+            <button onclick="window.location.reload()" class="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-redo mr-2"></i>Try Again
+            </button>
+            
+            <button onclick="goHome()" class="w-full bg-white bg-opacity-10 hover:bg-opacity-20 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300">
+                <i class="fas fa-home mr-2"></i>Go to Dashboard
+            </button>
+        </div>
+        
+        <!-- Connection Status -->
+        <div class="mt-8 p-4 bg-white bg-opacity-10 rounded-lg">
+            <div class="flex items-center justify-center space-x-2">
+                <div id="connection-status" class="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span class="text-sm">Connection Status: <span id="status-text">Offline</span></span>
+            </div>
+        </div>
+        
+        <!-- Features Available Offline -->
+        <div class="mt-8 text-left">
+            <h3 class="text-lg font-semibold mb-4 text-center">Available Offline:</h3>
+            <ul class="space-y-2 text-sm text-white text-opacity-80">
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                    View cached transactions
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                    Check your balance
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                    Browse bills and budgets
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-clock mr-2 text-yellow-400"></i>
+                    Add transactions (will sync later)
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Check connection status
+        function updateConnectionStatus() {
+            const statusDot = document.getElementById('connection-status');
+            const statusText = document.getElementById('status-text');
+            
+            if (navigator.onLine) {
+                statusDot.className = 'w-3 h-3 bg-green-500 rounded-full';
+                statusText.textContent = 'Online';
+                // Reload page when back online
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                statusDot.className = 'w-3 h-3 bg-red-500 rounded-full';
+                statusText.textContent = 'Offline';
+            }
+        }
+        
+        // Listen for connection changes
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        // Check status on load
+        updateConnectionStatus();
+        
+        // Check status every 5 seconds
+        setInterval(updateConnectionStatus, 5000);
+        
+        function goHome() {
+            window.location.href = '/dashboard.php';
+        }
+        
+        // Service worker messaging
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+                // Request background sync for any pending transactions
+                if ('sync' in window.ServiceWorkerRegistration.prototype) {
+                    registration.sync.register('background-sync');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
