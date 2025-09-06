@@ -626,3 +626,44 @@ window.formatMoney = (amount, currency = 'KES') => {
 
 // Chart instances storage
 window.chartInstances = {};
+
+
+
+
+// PWA App JavaScript
+console.log('Luidigitals Wallet PWA loaded');
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('SW registered: ', registration);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // Show update notification
+                            if (confirm('New version available! Reload to update?')) {
+                                window.location.reload();
+                            }
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.log('SW registration failed: ', error);
+            });
+    });
+}
+
+// Network status
+window.addEventListener('online', () => {
+    console.log('App is online');
+});
+
+window.addEventListener('offline', () => {
+    console.log('App is offline');
+});
